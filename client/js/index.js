@@ -28,6 +28,7 @@ function preload() {
   this.load.spritesheet('testBody', 'assets/spritesheets/testBody.png', {frameWidth: 32, frameHeight: 96});
   this.load.spritesheet('testFur', 'assets/spritesheets/testFur.png', {frameWidth: 32, frameHeight: 96});
   this.load.spritesheet('dude', 'assets/spritesheets/dude.png', {frameWidth: 32, frameHeight: 48});
+  this.load.image('scroll2', 'assets/images/Scroll_02.png');
 }
 
 function create() {
@@ -90,7 +91,7 @@ function create() {
   this.otherPlayers = this.physics.add.group();
   this.cursors = this.input.keyboard.createCursorKeys();
   console.log('self.socket = ', self.socket);
-  this.socket.on('currentPlayers', function (players) {
+  this.socket.on('currentPlayers', function (players, spells) {
     Object.keys(players).forEach(function (id) {
       console.log('Local players socket Id = ', players[id].playerId);
       if (players[id].playerId === self.socket.id) {
@@ -99,6 +100,7 @@ function create() {
         addOtherPlayers(self, players[id]);
       }
     });
+    spawnSpells(spells);
   });
   this.socket.on('newPlayer', function (playerInfo) {
     addOtherPlayers(self, playerInfo);
@@ -111,8 +113,8 @@ function create() {
     });
   });
   this.socket.on('playerMoved', function (playerInfo) {
-    console.log('playerMoved called successfully');
-    console.log(playerInfo.x, playerInfo.y);
+    //console.log('playerMoved called successfully');
+    //console.log(playerInfo.x, playerInfo.y);
     if (playerInfo.playerId === self.socket.id) {
       //console.log(playerInfo.x, playerInfo.y);
       self.stack.setPosition(playerInfo.x, playerInfo.y);
@@ -120,12 +122,11 @@ function create() {
       //self.stack3.setPosition(playerInfo.x, playerInfo.y);
       //localPlayerInfo.sprite.setPosition(playerInfo.x, playerInfo.y);
     } else {
-      console.log('someone else is moving')
+      //console.log('someone else is moving')
       self.otherPlayers.getChildren().forEach(function (otherPlayer) {
         if (playerInfo.playerId === otherPlayer.playerId) {
-          console.log(otherPlayer);
           otherPlayer.setPosition(playerInfo.x, playerInfo.y)
-          console.log(otherPlayer);
+          //console.log(otherPlayer);
         }
       });
     }
@@ -154,6 +155,40 @@ function create() {
     self.otherPlayers.add(otherPlayer);
     //console.log(otherPlayer, otherPlayer.x);
   }
+
+  function spawnSpells(spells) {
+    var spell0 = self.add.image(spells[0].x, spells[0].y, spells[0].Icon).setInteractive();
+    var spell1 = self.add.image(spells[1].x, spells[1].y, spells[1].Icon).setInteractive();
+    var spell2 = self.add.image(spells[2].x, spells[2].y, spells[2].Icon).setInteractive();
+    var spellInfo = {selection:'', Name:'', Descrip:'',locationX:'', locationY:''};
+    spell0.on('pointerdown', function (pointer){
+      //clickFunction();
+      if (pointer.rightButtonDown()) {
+        spellInfo.Name = spells[0].Name;
+        console.log(spellInfo.Name, ' was Right clicked');
+      } else {
+        console.log('spell was Left clicked');
+      }
+    });
+    spell1.on('pointerdown', function (pointer){
+      //clickFunction();
+      if (pointer.rightButtonDown()) {
+        spellInfo.Name = spells[1].Name;
+        console.log(spellInfo.Name, ' was Right clicked');
+      } else {
+        console.log('spell was Left clicked');
+      }
+    });
+    spell2.on('pointerdown', function (pointer){
+      //clickFunction();
+      if (pointer.rightButtonDown()) {
+        spellInfo.Name = spells[2].Name;
+        console.log(spellInfo.Name, ' was Right clicked');
+      } else {
+        console.log('spell was Left clicked');
+      }
+    });
+  }
 }
 
 function update() {
@@ -181,7 +216,7 @@ function update() {
 
     }
     if (this.cursors.up.isUp && this.cursors.down.isUp) {
-      
+
     }
   }
 }
