@@ -33,10 +33,10 @@ for (let info = 0; info < spawningLayer.data.length; info++) {
     remainder = (Math.floor(Math.floor(info % 200) * 48));
     division = (Math.floor(Math.floor(Math.floor(info) / 200)) * 48);
     spawnLocation.push({ x: remainder + 24, y: division + 24 })
-    console.log('info = ', info, 'remainder = ', remainder, 'division = ', division, 'spawnTile = ', spawnTile);
+    //console.log('info = ', info, 'remainder = ', remainder, 'division = ', division, 'spawnTile = ', spawnTile);
   }
 }
-console.log('spawnLocaiton: ', spawnLocation);
+//console.log('spawnLocaiton: ', spawnLocation);
 
 
 
@@ -71,7 +71,7 @@ io.on('connection', function (socket) {
     y: 5020,
     playerId: socket.id
   };
-  console.log('players[socket.id] = ', players[socket.id]);
+  //console.log('players[socket.id] = ', players[socket.id]);
   //send the players object to the new players
   socket.emit('currentPlayers', players, spells);
   //update all the other players of the new player
@@ -141,7 +141,7 @@ io.on('connection', function (socket) {
 
   function collision (x, y, tempX, tempY) {
     //console.log('collision function called');
-    console.log(x, y);
+    //console.log(x, y);
     //console.log('X: ', (Math.ceil(Math.ceil(x) / 200)) , 'Y: ', (Math.ceil(Math.ceil(y) / 200)));
     //console.log('blockingLayer', blockingLayer.data);
     //console.log('leingth', blockingLayer.data.length);

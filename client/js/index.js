@@ -20,7 +20,8 @@ var config = {
 var game = new Phaser.Game(config);
 var debugGraphics;
 var localPlayerInfo = {playerId:'', username:'', descrip:'', headColor:'',bodyColor:'', specialList:[]};
-
+var container = null;
+var otherContainer = null;
 
 function preload() {
   this.load.image('spritesheet', 'assets/images/spritesheet.png');
@@ -76,7 +77,7 @@ function create() {
         collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), //color of colliding tiles
         faceColor: new Phaser.Display.Color(40, 39, 37, 255) //color of colliding face edges
       });
-      console.log(ground_layer);
+      //console.log(ground_layer);
     }
 
 
@@ -90,7 +91,7 @@ function create() {
   this.socket = io();
   this.otherPlayers = this.physics.add.group();
   this.cursors = this.input.keyboard.createCursorKeys();
-  console.log('self.socket = ', self.socket);
+  //console.log('self.socket = ', self.socket);
   this.socket.on('currentPlayers', function (players, spells) {
     Object.keys(players).forEach(function (id) {
       console.log('Local players socket Id = ', players[id].playerId);
@@ -108,7 +109,7 @@ function create() {
   this.socket.on('disconnect', function (playerId) {
     self.otherPlayers.getChildren().forEach(function (otherPlayer) {
       if (playerId === otherPlayer.playerId) {
-        otherPlayer.destroy();
+        otherContainer.destroy();
       }
     });
   });
@@ -117,15 +118,12 @@ function create() {
     //console.log(playerInfo.x, playerInfo.y);
     if (playerInfo.playerId === self.socket.id) {
       //console.log(playerInfo.x, playerInfo.y);
-      self.stack.setPosition(playerInfo.x, playerInfo.y);
-      self.stack2.setPosition(playerInfo.x, playerInfo.y);
-      //self.stack3.setPosition(playerInfo.x, playerInfo.y);
-      //localPlayerInfo.sprite.setPosition(playerInfo.x, playerInfo.y);
+      self.container.setPosition(playerInfo.x, playerInfo.y);
     } else {
       //console.log('someone else is moving')
-      self.otherPlayers.getChildren().forEach(function (otherPlayer) {
-        if (playerInfo.playerId === otherPlayer.playerId) {
-          otherPlayer.setPosition(playerInfo.x, playerInfo.y)
+      self.otherPlayers.getChildren().forEach(function (otherContainer) {
+        if (playerInfo.playerId === otherContainer.playerId) {
+          otherContainer.setPosition(playerInfo.x, playerInfo.y);
           //console.log(otherPlayer);
         }
       });
@@ -134,26 +132,34 @@ function create() {
 
   function addPlayer(self, playerInfo) {
     console.log(playerInfo.playerId, 'Spawn Location = ', 'X: ', playerInfo.x, 'Y: ', playerInfo.y);
-    self.stack = self.physics.add.image(playerInfo.x, playerInfo.y, 'testBody');
-    self.stack2 = self.physics.add.image(playerInfo.x, playerInfo.y, 'testFur');
-    //self.stack3 = self.physics.add.image(playerInfo.x, playerInfo.y, 'dude');
+    self.container = self.add.container(playerInfo.x, playerInfo.y);
+    self.stack = self.physics.add.image(0, 0, 'testBody');
+    self.stack2 = self.physics.add.image(0, 0, 'testFur');
+    self.container.add([ self.stack, self.stack2 ]);
     localPlayerInfo.playerId = playerInfo.playerId;
     //localPlayerInfo.sprite = self.stack
-    let cam1 = self.cameras.main.setSize(920, 920).startFollow(self.stack).setName('Camera 1');
+    let cam1 = self.cameras.main.setSize(920, 920).startFollow(self.container).setName('Camera 1');
     self.stack2.setCollideWorldBounds(false);
-    self.physics.add.collider(self.stack2, ground_layer);
-    self.stack2.setMaxVelocity(200);
     self.stack2.setSize(8, 8);
     self.stack2.setOffset(12, 88);
-    console.log(localPlayerInfo.sprite)
+    //console.log(localPlayerInfo.sprite)
+
   }
+  var buttonDude = self.add.image(4820, 5020, 'dude').setInteractive();
+  buttonDude.on('pointerdown', function (pointer) {
+    //self.stack = self.physics.set.image(playerInfo.x, playerInfo.y, 'dude');
+    self.stack.setTexture('dude');
+  })
 
   function addOtherPlayers(self, playerInfo) {
-    const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'testBody');
+    otherContainer = self.add.container(playerInfo.x, playerInfo.y);
+    const otherPlayer = self.add.sprite(0, 0, 'testBody');
+    const otherPlayer2 = self.add.sprite(0, 0, 'testFur');
+    otherContainer.add([ otherPlayer, otherPlayer2 ]);
     otherPlayer.setTint(0xe978e1);
-    otherPlayer.playerId = playerInfo.playerId;
-    self.otherPlayers.add(otherPlayer);
-    //console.log(otherPlayer, otherPlayer.x);
+    otherPlayer2.setTint(0xeebc40);
+    otherContainer.playerId = playerInfo.playerId;
+    self.otherPlayers.add(otherContainer);
   }
 
   function spawnSpells(spells) {
@@ -162,7 +168,6 @@ function create() {
     var spell2 = self.add.image(spells[2].x, spells[2].y, spells[2].Icon).setInteractive();
     var spellInfo = {selection:'', Name:'', Descrip:'',locationX:'', locationY:''};
     spell0.on('pointerdown', function (pointer){
-      //clickFunction();
       if (pointer.rightButtonDown()) {
         spellInfo.Name = spells[0].Name;
         console.log(spellInfo.Name, ' was Right clicked');
@@ -171,7 +176,6 @@ function create() {
       }
     });
     spell1.on('pointerdown', function (pointer){
-      //clickFunction();
       if (pointer.rightButtonDown()) {
         spellInfo.Name = spells[1].Name;
         console.log(spellInfo.Name, ' was Right clicked');
@@ -179,8 +183,6 @@ function create() {
         console.log('spell was Left clicked');
       }
     });
-    spell2.on('pointerdown', function (pointer){
-      //clickFunction();
       if (pointer.rightButtonDown()) {
         spellInfo.Name = spells[2].Name;
         console.log(spellInfo.Name, ' was Right clicked');
