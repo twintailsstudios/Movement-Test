@@ -132,7 +132,7 @@ function create() {
 
   function addPlayer(self, playerInfo) {
     console.log(playerInfo.playerId, 'Spawn Location = ', 'X: ', playerInfo.x, 'Y: ', playerInfo.y);
-    self.container = self.add.container(playerInfo.x, playerInfo.y);
+    self.container = self.add.container(playerInfo.x, playerInfo.y).setInteractive();
     self.stack = self.physics.add.image(0, 0, 'testBody');
     self.stack2 = self.physics.add.image(0, 0, 'testFur');
     self.container.add([ self.stack, self.stack2 ]);
@@ -143,6 +143,13 @@ function create() {
     self.stack2.setSize(8, 8);
     self.stack2.setOffset(12, 88);
     //console.log(localPlayerInfo.sprite)
+    self.container.on('pointerdown', function (pointer) {
+      if (pointer.rightButtonDown()) {
+        console.log('Sprite was Right clicked');
+      } else {
+        console.log('Sprite was Left clicked');
+      }
+    });
 
   }
   var buttonDude = self.add.image(4820, 5020, 'dude').setInteractive();
@@ -152,7 +159,7 @@ function create() {
   })
 
   function addOtherPlayers(self, playerInfo) {
-    otherContainer = self.add.container(playerInfo.x, playerInfo.y);
+    otherContainer = self.add.container(playerInfo.x, playerInfo.y).setInteractive();
     const otherPlayer = self.add.sprite(0, 0, 'testBody');
     const otherPlayer2 = self.add.sprite(0, 0, 'testFur');
     otherContainer.add([ otherPlayer, otherPlayer2 ]);
@@ -161,6 +168,14 @@ function create() {
     otherContainer.playerId = playerInfo.playerId;
     self.otherPlayers.add(otherContainer);
     console.log('self.otherPlayers = ', self.otherPlayers);
+
+    otherContainer.on('pointerdown', function (pointer) {
+      if (pointer.rightButtonDown()) {
+        console.log('Other sprite was Right clicked');
+      } else {
+        console.log('Other sprite was Left clicked');
+      }
+    });
   }
 
   function spawnSpells(spells) {
