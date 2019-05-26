@@ -160,6 +160,7 @@ function create() {
     otherPlayer2.setTint(0xeebc40);
     otherContainer.playerId = playerInfo.playerId;
     self.otherPlayers.add(otherContainer);
+    console.log('self.otherPlayers = ', self.otherPlayers);
   }
 
   function spawnSpells(spells) {
@@ -183,6 +184,7 @@ function create() {
         console.log('spell was Left clicked');
       }
     });
+    spell2.on('pointerdown', function (pointer){
       if (pointer.rightButtonDown()) {
         spellInfo.Name = spells[2].Name;
         console.log(spellInfo.Name, ' was Right clicked');
